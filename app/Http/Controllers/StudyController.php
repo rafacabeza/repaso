@@ -15,7 +15,11 @@ class StudyController extends Controller
     public function index()
     {
         $studies = Study::all();
-        return $studies;
+        // dd($studies);
+        return view('study.index', [
+            'studies' => $studies
+        ]);
+        // return $studies;
         // return "lista de estudios";
     }
 
@@ -26,6 +30,7 @@ class StudyController extends Controller
      */
     public function create()
     {
+        return view('study.create');
         return "Aquí formulario de crear estudios";
     }
 
@@ -37,7 +42,16 @@ class StudyController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $rules = [
+            'code' => 'required|unique:studies,code|max:6',
+            'name' => 'required|max:100',
+            'abreviation' => 'required|max:4',
+        ];
+        
+        $this->validate($request, $rules);
+        $study = Study::create($request->all());
+        return redirect('/studies');
+        // echo "store";
     }
 
     /**
@@ -48,9 +62,11 @@ class StudyController extends Controller
      */
     public function show($id)
     {
-        $study = Study::find($id);
-
-        return "Mostrar estudio $study";
+        $study = Study::find($id);        
+        return view('study.show', [
+            'study' => $study
+        ]);
+        // return "Mostrar estudio $study";
     }
 
     /**
@@ -61,7 +77,7 @@ class StudyController extends Controller
      */
     public function edit(Study $study)
     {
-        //
+        return view('study.edit', ['study' => $study]);
     }
 
     /**
@@ -73,7 +89,9 @@ class StudyController extends Controller
      */
     public function update(Request $request, Study $study)
     {
-        //
+        $study->fill($request->all());
+        $study->save();
+        return redirect('/studies');
     }
 
     /**
@@ -84,6 +102,8 @@ class StudyController extends Controller
      */
     public function destroy(Study $study)
     {
-        //
+        $study->delete();
+        // Study::destroy($id);
+        return back();
     }
 }
